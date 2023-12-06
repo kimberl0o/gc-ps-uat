@@ -1,12 +1,12 @@
 .DS_Store
 
-application/cache/*
-!application/cache/index.html
+gateway/application/cache/*
+!gateway/application/cache/index.html
 
-application/logs/*
-!application/logs/index.html
+gateway/application/logs/*
+!gateway/application/logs/index.html
 
-!application/*/.htaccess
+!gateway/application/*/.htaccess
 
 composer.lock
 
@@ -29,8 +29,8 @@ user_guide_src/cilexer/pycilexer.egg-info/*
 *.sublime-project
 /tests/tests/
 /tests/results/
-ci_sessions/*
+gateway/ci_sessions/*
 
 # Database
 #-------------------------
-application/config/database.php
+gateway/application/config/database.php
