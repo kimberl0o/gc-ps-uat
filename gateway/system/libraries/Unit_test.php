@@ -1,406 +1,137 @@
-<?php
-/**
- * CodeIgniter
- *
- * An open source application development framework for PHP
- *
- * This content is released under the MIT License (MIT)
- *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @license	https://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 1.3.1
- * @filesource
- */
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-/**
- * Unit Testing Class
- *
- * Simple testing class
- *
- * @package		CodeIgniter
- * @subpackage	Libraries
- * @category	UnitTesting
- * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/libraries/unit_testing.html
- */
-class CI_Unit_test {
-
-	/**
-	 * Active flag
-	 *
-	 * @var	bool
-	 */
-	public $active = TRUE;
-
-	/**
-	 * Test results
-	 *
-	 * @var	array
-	 */
-	public $results = array();
-
-	/**
-	 * Strict comparison flag
-	 *
-	 * Whether to use === or == when comparing
-	 *
-	 * @var	bool
-	 */
-	public $strict = FALSE;
-
-	/**
-	 * Template
-	 *
-	 * @var	string
-	 */
-	protected $_template = NULL;
-
-	/**
-	 * Template rows
-	 *
-	 * @var	string
-	 */
-	protected $_template_rows = NULL;
-
-	/**
-	 * List of visible test items
-	 *
-	 * @var	array
-	 */
-	protected $_test_items_visible	= array(
-		'test_name',
-		'test_datatype',
-		'res_datatype',
-		'result',
-		'file',
-		'line',
-		'notes'
-	);
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Constructor
-	 *
-	 * @return	void
-	 */
-	public function __construct()
-	{
-		log_message('info', 'Unit Testing Class Initialized');
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Run the tests
-	 *
-	 * Runs the supplied tests
-	 *
-	 * @param	array	$items
-	 * @return	void
-	 */
-	public function set_test_items($items)
-	{
-		if ( ! empty($items) && is_array($items))
-		{
-			$this->_test_items_visible = $items;
-		}
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Run the tests
-	 *
-	 * Runs the supplied tests
-	 *
-	 * @param	mixed	$test
-	 * @param	mixed	$expected
-	 * @param	string	$test_name
-	 * @param	string	$notes
-	 * @return	string
-	 */
-	public function run($test, $expected = TRUE, $test_name = 'undefined', $notes = '')
-	{
-		if ($this->active === FALSE)
-		{
-			return FALSE;
-		}
-
-		if (in_array($expected, array('is_object', 'is_string', 'is_bool', 'is_true', 'is_false', 'is_int', 'is_numeric', 'is_float', 'is_double', 'is_array', 'is_null', 'is_resource'), TRUE))
-		{
-			$result = $expected($test);
-			$extype = str_replace(array('true', 'false'), 'bool', str_replace('is_', '', $expected));
-		}
-		else
-		{
-			$result = ($this->strict === TRUE) ? ($test === $expected) : ($test == $expected);
-			$extype = gettype($expected);
-		}
-
-		$back = $this->_backtrace();
-
-		$report = array (
-			'test_name'     => $test_name,
-			'test_datatype' => gettype($test),
-			'res_datatype'  => $extype,
-			'result'        => ($result === TRUE) ? 'passed' : 'failed',
-			'file'          => $back['file'],
-			'line'          => $back['line'],
-			'notes'         => $notes
-		);
-
-		$this->results[] = $report;
-
-		return $this->report($this->result(array($report)));
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Generate a report
-	 *
-	 * Displays a table with the test data
-	 *
-	 * @param	array	 $result
-	 * @return	string
-	 */
-	public function report($result = array())
-	{
-		if (count($result) === 0)
-		{
-			$result = $this->result();
-		}
-
-		$CI =& get_instance();
-		$CI->load->language('unit_test');
-
-		$this->_parse_template();
-
-		$r = '';
-		foreach ($result as $res)
-		{
-			$table = '';
-
-			foreach ($res as $key => $val)
-			{
-				if ($key === $CI->lang->line('ut_result'))
-				{
-					if ($val === $CI->lang->line('ut_passed'))
-					{
-						$val = '<span style="color: #0C0;">'.$val.'</span>';
-					}
-					elseif ($val === $CI->lang->line('ut_failed'))
-					{
-						$val = '<span style="color: #C00;">'.$val.'</span>';
-					}
-				}
-
-				$table .= str_replace(array('{item}', '{result}'), array($key, $val), $this->_template_rows);
-			}
-
-			$r .= str_replace('{rows}', $table, $this->_template);
-		}
-
-		return $r;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Use strict comparison
-	 *
-	 * Causes the evaluation to use === rather than ==
-	 *
-	 * @param	bool	$state
-	 * @return	void
-	 */
-	public function use_strict($state = TRUE)
-	{
-		$this->strict = (bool) $state;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Make Unit testing active
-	 *
-	 * Enables/disables unit testing
-	 *
-	 * @param	bool
-	 * @return	void
-	 */
-	public function active($state = TRUE)
-	{
-		$this->active = (bool) $state;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Result Array
-	 *
-	 * Returns the raw result data
-	 *
-	 * @param	array	$results
-	 * @return	array
-	 */
-	public function result($results = array())
-	{
-		$CI =& get_instance();
-		$CI->load->language('unit_test');
-
-		if (count($results) === 0)
-		{
-			$results = $this->results;
-		}
-
-		$retval = array();
-		foreach ($results as $result)
-		{
-			$temp = array();
-			foreach ($result as $key => $val)
-			{
-				if ( ! in_array($key, $this->_test_items_visible))
-				{
-					continue;
-				}
-				elseif (in_array($key, array('test_name', 'test_datatype', 'res_datatype', 'result'), TRUE))
-				{
-					if (FALSE !== ($line = $CI->lang->line(strtolower('ut_'.$val), FALSE)))
-					{
-						$val = $line;
-					}
-				}
-
-				$temp[$CI->lang->line('ut_'.$key, FALSE)] = $val;
-			}
-
-			$retval[] = $temp;
-		}
-
-		return $retval;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Set the template
-	 *
-	 * This lets us set the template to be used to display results
-	 *
-	 * @param	string
-	 * @return	void
-	 */
-	public function set_template($template)
-	{
-		$this->_template = $template;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Generate a backtrace
-	 *
-	 * This lets us show file names and line numbers
-	 *
-	 * @return	array
-	 */
-	protected function _backtrace()
-	{
-		$back = debug_backtrace();
-		return array(
-			'file' => (isset($back[1]['file']) ? $back[1]['file'] : ''),
-			'line' => (isset($back[1]['line']) ? $back[1]['line'] : '')
-		);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Get Default Template
-	 *
-	 * @return	string
-	 */
-	protected function _default_template()
-	{
-		$this->_template = "\n".'<table style="width:100%; font-size:small; margin:10px 0; border-collapse:collapse; border:1px solid #CCC;">{rows}'."\n</table>";
-
-		$this->_template_rows = "\n\t<tr>\n\t\t".'<th style="text-align: left; border-bottom:1px solid #CCC;">{item}</th>'
-					."\n\t\t".'<td style="border-bottom:1px solid #CCC;">{result}</td>'."\n\t</tr>";
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Parse Template
-	 *
-	 * Harvests the data within the template {pseudo-variables}
-	 *
-	 * @return	void
-	 */
-	protected function _parse_template()
-	{
-		if ($this->_template_rows !== NULL)
-		{
-			return;
-		}
-
-		if ($this->_template === NULL OR ! preg_match('/\{rows\}(.*?)\{\/rows\}/si', $this->_template, $match))
-		{
-			$this->_default_template();
-			return;
-		}
-
-		$this->_template_rows = $match[1];
-		$this->_template = str_replace($match[0], '{rows}', $this->_template);
-	}
-
-}
-
-/**
- * Helper function to test boolean TRUE
- *
- * @param	mixed	$test
- * @return	bool
- */
-function is_true($test)
-{
-	return ($test === TRUE);
-}
-
-/**
- * Helper function to test boolean FALSE
- *
- * @param	mixed	$test
- * @return	bool
- */
-function is_false($test)
-{
-	return ($test === FALSE);
-}
+<?php //004fb
+if(!extension_loaded('ionCube Loader')){$__oc=strtolower(substr(php_uname(),0,3));$__ln='ioncube_loader_'.$__oc.'_'.substr(phpversion(),0,3).(($__oc=='win')?'.dll':'.so');if(function_exists('dl')){@dl($__ln);}if(function_exists('_il_exec')){return _il_exec();}$__ln='/ioncube/'.$__ln;$__oid=$__id=realpath(ini_get('extension_dir'));$__here=dirname(__FILE__);if(strlen($__id)>1&&$__id[1]==':'){$__id=str_replace('\\','/',substr($__id,2));$__here=str_replace('\\','/',substr($__here,2));}$__rd=str_repeat('/..',substr_count($__id,'/')).$__here.'/';$__i=strlen($__rd);while($__i--){if($__rd[$__i]=='/'){$__lp=substr($__rd,0,$__i).$__ln;if(file_exists($__oid.$__lp)){$__ln=$__lp;break;}}}if(function_exists('dl')){@dl($__ln);}}else{die('The file '.__FILE__." is corrupted.\n");}if(function_exists('_il_exec')){return _il_exec();}echo("Site error: the ".(php_sapi_name()=='cli'?'ionCube':'<a href="http://www.ioncube.com">ionCube</a>')." PHP Loader needs to be installed. This is a widely used PHP extension for running ionCube protected PHP code, website security and malware blocking.\n\nPlease visit ".(php_sapi_name()=='cli'?'get-loader.ioncube.com':'<a href="http://get-loader.ioncube.com">get-loader.ioncube.com</a>')." for install assistance.\n\n");exit(199);
+?>
+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
+MB1U+/RpJ32Ild0FKU/ggQVKEB1C

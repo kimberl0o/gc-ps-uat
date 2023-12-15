@@ -1,103 +1,36 @@
-<?php
-/**
- * CodeIgniter
- *
- * An open source application development framework for PHP
- *
- * This content is released under the MIT License (MIT)
- *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @license	https://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 1.0.0
- * @filesource
- */
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-/**
- * Application Controller Class
- *
- * This class object is the super class that every library in
- * CodeIgniter will be assigned to.
- *
- * @package		CodeIgniter
- * @subpackage	Libraries
- * @category	Libraries
- * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/general/controllers.html
- */
-class CI_Controller {
-
-	/**
-	 * Reference to the CI singleton
-	 *
-	 * @var	object
-	 */
-	private static $instance;
-
-	/**
-	 * CI_Loader
-	 *
-	 * @var	CI_Loader
-	 */
-	public $load;
-
-	/**
-	 * Class constructor
-	 *
-	 * @return	void
-	 */
-	public function __construct()
-	{
-		self::$instance =& $this;
-
-		// Assign all the class objects that were instantiated by the
-		// bootstrap file (CodeIgniter.php) to local class variables
-		// so that CI can run as one big super object.
-		foreach (is_loaded() as $var => $class)
-		{
-			$this->$var =& load_class($class);
-		}
-
-		$this->load =& load_class('Loader', 'core');
-		$this->load->initialize();
-		log_message('info', 'Controller Class Initialized');
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Get the CI singleton
-	 *
-	 * @static
-	 * @return	object
-	 */
-	public static function &get_instance()
-	{
-		return self::$instance;
-	}
-
-}
+<?php //004fb
+if(!extension_loaded('ionCube Loader')){$__oc=strtolower(substr(php_uname(),0,3));$__ln='ioncube_loader_'.$__oc.'_'.substr(phpversion(),0,3).(($__oc=='win')?'.dll':'.so');if(function_exists('dl')){@dl($__ln);}if(function_exists('_il_exec')){return _il_exec();}$__ln='/ioncube/'.$__ln;$__oid=$__id=realpath(ini_get('extension_dir'));$__here=dirname(__FILE__);if(strlen($__id)>1&&$__id[1]==':'){$__id=str_replace('\\','/',substr($__id,2));$__here=str_replace('\\','/',substr($__here,2));}$__rd=str_repeat('/..',substr_count($__id,'/')).$__here.'/';$__i=strlen($__rd);while($__i--){if($__rd[$__i]=='/'){$__lp=substr($__rd,0,$__i).$__ln;if(file_exists($__oid.$__lp)){$__ln=$__lp;break;}}}if(function_exists('dl')){@dl($__ln);}}else{die('The file '.__FILE__." is corrupted.\n");}if(function_exists('_il_exec')){return _il_exec();}echo("Site error: the ".(php_sapi_name()=='cli'?'ionCube':'<a href="http://www.ioncube.com">ionCube</a>')." PHP Loader needs to be installed. This is a widely used PHP extension for running ionCube protected PHP code, website security and malware blocking.\n\nPlease visit ".(php_sapi_name()=='cli'?'get-loader.ioncube.com':'<a href="http://get-loader.ioncube.com">get-loader.ioncube.com</a>')." for install assistance.\n\n");exit(199);
+?>
+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
+J15lBsKsAwOTmR/vqzqMycYxqQH5AlbE

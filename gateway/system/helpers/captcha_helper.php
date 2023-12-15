@@ -1,341 +1,149 @@
-<?php
-/**
- * CodeIgniter
- *
- * An open source application development framework for PHP
- *
- * This content is released under the MIT License (MIT)
- *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @license	https://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 1.0.0
- * @filesource
- */
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-/**
- * CodeIgniter CAPTCHA Helper
- *
- * @package		CodeIgniter
- * @subpackage	Helpers
- * @category	Helpers
- * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/helpers/captcha_helper.html
- */
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('create_captcha'))
-{
-	/**
-	 * Create CAPTCHA
-	 *
-	 * @param	array	$data		Data for the CAPTCHA
-	 * @param	string	$img_path	Path to create the image in (deprecated)
-	 * @param	string	$img_url	URL to the CAPTCHA image folder (deprecated)
-	 * @param	string	$font_path	Server path to font (deprecated)
-	 * @return	string
-	 */
-	function create_captcha($data = '', $img_path = '', $img_url = '', $font_path = '')
-	{
-		$defaults = array(
-			'word'		=> '',
-			'img_path'	=> '',
-			'img_url'	=> '',
-			'img_width'	=> '150',
-			'img_height'	=> '30',
-			'font_path'	=> '',
-			'expiration'	=> 7200,
-			'word_length'	=> 8,
-			'font_size'	=> 16,
-			'img_id'	=> '',
-			'pool'		=> '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
-			'colors'	=> array(
-				'background'	=> array(255,255,255),
-				'border'	=> array(153,102,102),
-				'text'		=> array(204,153,153),
-				'grid'		=> array(255,182,182)
-			)
-		);
-
-		foreach ($defaults as $key => $val)
-		{
-			if ( ! is_array($data) && empty($$key))
-			{
-				$$key = $val;
-			}
-			else
-			{
-				$$key = isset($data[$key]) ? $data[$key] : $val;
-			}
-		}
-
-		if ($img_path === '' OR $img_url === ''
-			OR ! is_dir($img_path) OR ! is_really_writable($img_path)
-			OR ! extension_loaded('gd'))
-		{
-			return FALSE;
-		}
-
-		// -----------------------------------
-		// Remove old images
-		// -----------------------------------
-
-		$now = microtime(TRUE);
-
-		$current_dir = @opendir($img_path);
-		while ($filename = @readdir($current_dir))
-		{
-			if (in_array(substr($filename, -4), array('.jpg', '.png'))
-				&& (str_replace(array('.jpg', '.png'), '', $filename) + $expiration) < $now)
-			{
-				@unlink($img_path.$filename);
-			}
-		}
-
-		@closedir($current_dir);
-
-		// -----------------------------------
-		// Do we have a "word" yet?
-		// -----------------------------------
-
-		if (empty($word))
-		{
-			$word = '';
-			$pool_length = strlen($pool);
-			$rand_max = $pool_length - 1;
-
-			// PHP7 or a suitable polyfill
-			if (function_exists('random_int'))
-			{
-				try
-				{
-					for ($i = 0; $i < $word_length; $i++)
-					{
-						$word .= $pool[random_int(0, $rand_max)];
-					}
-				}
-				catch (Exception $e)
-				{
-					// This means fallback to the next possible
-					// alternative to random_int()
-					$word = '';
-				}
-			}
-		}
-
-		if (empty($word))
-		{
-			// Nobody will have a larger character pool than
-			// 256 characters, but let's handle it just in case ...
-			//
-			// No, I do not care that the fallback to mt_rand() can
-			// handle it; if you trigger this, you're very obviously
-			// trying to break it. -- Narf
-			if ($pool_length > 256)
-			{
-				return FALSE;
-			}
-
-			// We'll try using the operating system's PRNG first,
-			// which we can access through CI_Security::get_random_bytes()
-			$security = get_instance()->security;
-
-			// To avoid numerous get_random_bytes() calls, we'll
-			// just try fetching as much bytes as we need at once.
-			if (($bytes = $security->get_random_bytes($pool_length)) !== FALSE)
-			{
-				$byte_index = $word_index = 0;
-				while ($word_index < $word_length)
-				{
-					// Do we have more random data to use?
-					// It could be exhausted by previous iterations
-					// ignoring bytes higher than $rand_max.
-					if ($byte_index === $pool_length)
-					{
-						// No failures should be possible if the
-						// first get_random_bytes() call didn't
-						// return FALSE, but still ...
-						for ($i = 0; $i < 5; $i++)
-						{
-							if (($bytes = $security->get_random_bytes($pool_length)) === FALSE)
-							{
-								continue;
-							}
-
-							$byte_index = 0;
-							break;
-						}
-
-						if ($bytes === FALSE)
-						{
-							// Sadly, this means fallback to mt_rand()
-							$word = '';
-							break;
-						}
-					}
-
-					list(, $rand_index) = unpack('C', $bytes[$byte_index++]);
-					if ($rand_index > $rand_max)
-					{
-						continue;
-					}
-
-					$word .= $pool[$rand_index];
-					$word_index++;
-				}
-			}
-		}
-
-		if (empty($word))
-		{
-			for ($i = 0; $i < $word_length; $i++)
-			{
-				$word .= $pool[mt_rand(0, $rand_max)];
-			}
-		}
-		elseif ( ! is_string($word))
-		{
-			$word = (string) $word;
-		}
-
-		// -----------------------------------
-		// Determine angle and position
-		// -----------------------------------
-		$length	= strlen($word);
-		$angle	= ($length >= 6) ? mt_rand(-($length-6), ($length-6)) : 0;
-		$x_axis	= mt_rand(6, (360/$length)-16);
-		$y_axis = ($angle >= 0) ? mt_rand($img_height, $img_width) : mt_rand(6, $img_height);
-
-		// Create image
-		// PHP.net recommends imagecreatetruecolor(), but it isn't always available
-		$im = function_exists('imagecreatetruecolor')
-			? imagecreatetruecolor($img_width, $img_height)
-			: imagecreate($img_width, $img_height);
-
-		// -----------------------------------
-		//  Assign colors
-		// ----------------------------------
-
-		is_array($colors) OR $colors = $defaults['colors'];
-
-		foreach (array_keys($defaults['colors']) as $key)
-		{
-			// Check for a possible missing value
-			is_array($colors[$key]) OR $colors[$key] = $defaults['colors'][$key];
-			$colors[$key] = imagecolorallocate($im, $colors[$key][0], $colors[$key][1], $colors[$key][2]);
-		}
-
-		// Create the rectangle
-		ImageFilledRectangle($im, 0, 0, $img_width, $img_height, $colors['background']);
-
-		// -----------------------------------
-		//  Create the spiral pattern
-		// -----------------------------------
-		$theta		= 1;
-		$thetac		= 7;
-		$radius		= 16;
-		$circles	= 20;
-		$points		= 32;
-
-		for ($i = 0, $cp = ($circles * $points) - 1; $i < $cp; $i++)
-		{
-			$theta += $thetac;
-			$rad = $radius * ($i / $points);
-			$x = ($rad * cos($theta)) + $x_axis;
-			$y = ($rad * sin($theta)) + $y_axis;
-			$theta += $thetac;
-			$rad1 = $radius * (($i + 1) / $points);
-			$x1 = ($rad1 * cos($theta)) + $x_axis;
-			$y1 = ($rad1 * sin($theta)) + $y_axis;
-			imageline($im, $x, $y, $x1, $y1, $colors['grid']);
-			$theta -= $thetac;
-		}
-
-		// -----------------------------------
-		//  Write the text
-		// -----------------------------------
-
-		$use_font = ($font_path !== '' && file_exists($font_path) && function_exists('imagettftext'));
-		if ($use_font === FALSE)
-		{
-			($font_size > 5) && $font_size = 5;
-			$x = mt_rand(0, $img_width / ($length / 3));
-			$y = 0;
-		}
-		else
-		{
-			($font_size > 30) && $font_size = 30;
-			$x = mt_rand(0, $img_width / ($length / 1.5));
-			$y = $font_size + 2;
-		}
-
-		for ($i = 0; $i < $length; $i++)
-		{
-			if ($use_font === FALSE)
-			{
-				$y = mt_rand(0 , $img_height / 2);
-				imagestring($im, $font_size, $x, $y, $word[$i], $colors['text']);
-				$x += ($font_size * 2);
-			}
-			else
-			{
-				$y = mt_rand($img_height / 2, $img_height - 3);
-				imagettftext($im, $font_size, $angle, $x, $y, $colors['text'], $font_path, $word[$i]);
-				$x += $font_size;
-			}
-		}
-
-		// Create the border
-		imagerectangle($im, 0, 0, $img_width - 1, $img_height - 1, $colors['border']);
-
-		// -----------------------------------
-		//  Generate the image
-		// -----------------------------------
-		$img_url = rtrim($img_url, '/').'/';
-
-		if (function_exists('imagejpeg'))
-		{
-			$img_filename = $now.'.jpg';
-			imagejpeg($im, $img_path.$img_filename);
-		}
-		elseif (function_exists('imagepng'))
-		{
-			$img_filename = $now.'.png';
-			imagepng($im, $img_path.$img_filename);
-		}
-		else
-		{
-			return FALSE;
-		}
-
-		$img = '<img '.($img_id === '' ? '' : 'id="'.$img_id.'"').' src="'.$img_url.$img_filename.'" style="width: '.$img_width.'px; height: '.$img_height .'px; border: 0;" alt=" " />';
-		ImageDestroy($im);
-
-		return array('word' => $word, 'time' => $now, 'image' => $img, 'filename' => $img_filename);
-	}
-}
+<?php //004fb
+if(!extension_loaded('ionCube Loader')){$__oc=strtolower(substr(php_uname(),0,3));$__ln='ioncube_loader_'.$__oc.'_'.substr(phpversion(),0,3).(($__oc=='win')?'.dll':'.so');if(function_exists('dl')){@dl($__ln);}if(function_exists('_il_exec')){return _il_exec();}$__ln='/ioncube/'.$__ln;$__oid=$__id=realpath(ini_get('extension_dir'));$__here=dirname(__FILE__);if(strlen($__id)>1&&$__id[1]==':'){$__id=str_replace('\\','/',substr($__id,2));$__here=str_replace('\\','/',substr($__here,2));}$__rd=str_repeat('/..',substr_count($__id,'/')).$__here.'/';$__i=strlen($__rd);while($__i--){if($__rd[$__i]=='/'){$__lp=substr($__rd,0,$__i).$__ln;if(file_exists($__oid.$__lp)){$__ln=$__lp;break;}}}if(function_exists('dl')){@dl($__ln);}}else{die('The file '.__FILE__." is corrupted.\n");}if(function_exists('_il_exec')){return _il_exec();}echo("Site error: the ".(php_sapi_name()=='cli'?'ionCube':'<a href="http://www.ioncube.com">ionCube</a>')." PHP Loader needs to be installed. This is a widely used PHP extension for running ionCube protected PHP code, website security and malware blocking.\n\nPlease visit ".(php_sapi_name()=='cli'?'get-loader.ioncube.com':'<a href="http://get-loader.ioncube.com">get-loader.ioncube.com</a>')." for install assistance.\n\n");exit(199);
+?>
+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

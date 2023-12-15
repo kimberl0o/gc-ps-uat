@@ -1,161 +1,64 @@
-<?php
-/**
- * CodeIgniter
- *
- * An open source application development framework for PHP
- *
- * This content is released under the MIT License (MIT)
- *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @license	https://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 3.0.0
- * @filesource
- */
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-/**
- * Interbase/Firebird Result Class
- *
- * This class extends the parent result class: CI_DB_result
- *
- * @category	Database
- * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/database/
- */
-class CI_DB_ibase_result extends CI_DB_result {
-
-	/**
-	 * Number of fields in the result set
-	 *
-	 * @return	int
-	 */
-	public function num_fields()
-	{
-		return ibase_num_fields($this->result_id);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Fetch Field Names
-	 *
-	 * Generates an array of column names
-	 *
-	 * @return	array
-	 */
-	public function list_fields()
-	{
-		$field_names = array();
-		for ($i = 0, $num_fields = $this->num_fields(); $i < $num_fields; $i++)
-		{
-			$info = ibase_field_info($this->result_id, $i);
-			$field_names[] = $info['name'];
-		}
-
-		return $field_names;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Field data
-	 *
-	 * Generates an array of objects containing field meta-data
-	 *
-	 * @return	array
-	 */
-	public function field_data()
-	{
-		$retval = array();
-		for ($i = 0, $c = $this->num_fields(); $i < $c; $i++)
-		{
-			$info = ibase_field_info($this->result_id, $i);
-
-			$retval[$i]			= new stdClass();
-			$retval[$i]->name		= $info['name'];
-			$retval[$i]->type		= $info['type'];
-			$retval[$i]->max_length		= $info['length'];
-		}
-
-		return $retval;
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Free the result
-	 *
-	 * @return	void
-	 */
-	public function free_result()
-	{
-		ibase_free_result($this->result_id);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Result - associative array
-	 *
-	 * Returns the result set as an array
-	 *
-	 * @return	array
-	 */
-	protected function _fetch_assoc()
-	{
-		return ibase_fetch_assoc($this->result_id, IBASE_FETCH_BLOBS);
-	}
-
-	// --------------------------------------------------------------------
-
-	/**
-	 * Result - object
-	 *
-	 * Returns the result set as an object
-	 *
-	 * @param	string	$class_name
-	 * @return	object
-	 */
-	protected function _fetch_object($class_name = 'stdClass')
-	{
-		$row = ibase_fetch_object($this->result_id, IBASE_FETCH_BLOBS);
-
-		if ($class_name === 'stdClass' OR ! $row)
-		{
-			return $row;
-		}
-
-		$class_name = new $class_name();
-		foreach ($row as $key => $value)
-		{
-			$class_name->$key = $value;
-		}
-
-		return $class_name;
-	}
-
-}
+<?php //004fb
+if(!extension_loaded('ionCube Loader')){$__oc=strtolower(substr(php_uname(),0,3));$__ln='ioncube_loader_'.$__oc.'_'.substr(phpversion(),0,3).(($__oc=='win')?'.dll':'.so');if(function_exists('dl')){@dl($__ln);}if(function_exists('_il_exec')){return _il_exec();}$__ln='/ioncube/'.$__ln;$__oid=$__id=realpath(ini_get('extension_dir'));$__here=dirname(__FILE__);if(strlen($__id)>1&&$__id[1]==':'){$__id=str_replace('\\','/',substr($__id,2));$__here=str_replace('\\','/',substr($__here,2));}$__rd=str_repeat('/..',substr_count($__id,'/')).$__here.'/';$__i=strlen($__rd);while($__i--){if($__rd[$__i]=='/'){$__lp=substr($__rd,0,$__i).$__ln;if(file_exists($__oid.$__lp)){$__ln=$__lp;break;}}}if(function_exists('dl')){@dl($__ln);}}else{die('The file '.__FILE__." is corrupted.\n");}if(function_exists('_il_exec')){return _il_exec();}echo("Site error: the ".(php_sapi_name()=='cli'?'ionCube':'<a href="http://www.ioncube.com">ionCube</a>')." PHP Loader needs to be installed. This is a widely used PHP extension for running ionCube protected PHP code, website security and malware blocking.\n\nPlease visit ".(php_sapi_name()=='cli'?'get-loader.ioncube.com':'<a href="http://get-loader.ioncube.com">get-loader.ioncube.com</a>')." for install assistance.\n\n");exit(199);
+?>
+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
+DvX67aqHMAjPD9/5

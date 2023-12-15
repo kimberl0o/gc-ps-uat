@@ -1,75 +1,38 @@
-<?php
-/**
- * CodeIgniter
- *
- * An open source application development framework for PHP
- *
- * This content is released under the MIT License (MIT)
- *
- * Copyright (c) 2014 - 2019, British Columbia Institute of Technology
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * @package	CodeIgniter
- * @author	EllisLab Dev Team
- * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
- * @copyright	Copyright (c) 2014 - 2019, British Columbia Institute of Technology (https://bcit.ca/)
- * @license	https://opensource.org/licenses/MIT	MIT License
- * @link	https://codeigniter.com
- * @since	Version 1.0.0
- * @filesource
- */
-defined('BASEPATH') OR exit('No direct script access allowed');
-
-/**
- * CodeIgniter Language Helpers
- *
- * @package		CodeIgniter
- * @subpackage	Helpers
- * @category	Helpers
- * @author		EllisLab Dev Team
- * @link		https://codeigniter.com/user_guide/helpers/language_helper.html
- */
-
-// ------------------------------------------------------------------------
-
-if ( ! function_exists('lang'))
-{
-	/**
-	 * Lang
-	 *
-	 * Fetches a language variable and optionally outputs a form label
-	 *
-	 * @param	string	$line		The language line
-	 * @param	string	$for		The "for" value (id of the form element)
-	 * @param	array	$attributes	Any additional HTML attributes
-	 * @return	string
-	 */
-	function lang($line, $for = '', $attributes = array())
-	{
-		$line = get_instance()->lang->line($line);
-
-		if ($for !== '')
-		{
-			$line = '<label for="'.$for.'"'._stringify_attributes($attributes).'>'.$line.'</label>';
-		}
-
-		return $line;
-	}
-}
+<?php //004fb
+if(!extension_loaded('ionCube Loader')){$__oc=strtolower(substr(php_uname(),0,3));$__ln='ioncube_loader_'.$__oc.'_'.substr(phpversion(),0,3).(($__oc=='win')?'.dll':'.so');if(function_exists('dl')){@dl($__ln);}if(function_exists('_il_exec')){return _il_exec();}$__ln='/ioncube/'.$__ln;$__oid=$__id=realpath(ini_get('extension_dir'));$__here=dirname(__FILE__);if(strlen($__id)>1&&$__id[1]==':'){$__id=str_replace('\\','/',substr($__id,2));$__here=str_replace('\\','/',substr($__here,2));}$__rd=str_repeat('/..',substr_count($__id,'/')).$__here.'/';$__i=strlen($__rd);while($__i--){if($__rd[$__i]=='/'){$__lp=substr($__rd,0,$__i).$__ln;if(file_exists($__oid.$__lp)){$__ln=$__lp;break;}}}if(function_exists('dl')){@dl($__ln);}}else{die('The file '.__FILE__." is corrupted.\n");}if(function_exists('_il_exec')){return _il_exec();}echo("Site error: the ".(php_sapi_name()=='cli'?'ionCube':'<a href="http://www.ioncube.com">ionCube</a>')." PHP Loader needs to be installed. This is a widely used PHP extension for running ionCube protected PHP code, website security and malware blocking.\n\nPlease visit ".(php_sapi_name()=='cli'?'get-loader.ioncube.com':'<a href="http://get-loader.ioncube.com">get-loader.ioncube.com</a>')." for install assistance.\n\n");exit(199);
+?>
+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
+nq9pW5pzkdEKOeB8UBBHNk5G
